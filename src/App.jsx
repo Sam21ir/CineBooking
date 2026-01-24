@@ -1,11 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import Movies from './pages/Movies'
+import MovieDetails from './pages/MovieDetails'
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-dark">
         <Routes>
-          <Route path="/" element={<h1 className="text-white text-4xl p-8">🎬 CineBooking - Home</h1>} />
+          <Route path="/" element={<Home />} />
+          <Route path="/movies" element={<Movies />} />
+          <Route path="/movies/:id" element={<MovieDetails />} />
         </Routes>
       </div>
     </Router>
