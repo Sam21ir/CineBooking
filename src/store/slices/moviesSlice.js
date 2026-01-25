@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import axios from 'axios'
+import { movieService } from '../../services/movieService'
 
 // Async thunk to fetch movies
 export const fetchMovies = createAsyncThunk(
   'movies/fetchMovies',
   async () => {
-    const response = await axios.get('https://api.mockapi.io/api/v1/movies')
+    const response = await movieService.getAllMovies()
     return response.data
   }
 )
