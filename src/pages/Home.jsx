@@ -1,6 +1,16 @@
 import MovieGrid from '../components/movies/MovieGrid'
+import Hero from '../components/common/Hero'
+
 
 function Home() {
+    // Featured movie for Hero
+  const featuredMovie = {
+    id: 1,
+    title: "Inception",
+    description: "Un voleur qui s'introduit dans les rêves des gens pour voler leurs secrets se voit confier une mission impossible : implanter une idée dans l'esprit d'un PDG.",
+    imageUrl: "https://image.tmdb.org/t/p/original/s3TBrRGB1iav7gFOCNx3H31MoES.jpg"
+  }
+
   // Dummy data for testing
   const movies = [
     {
@@ -41,10 +51,14 @@ function Home() {
   ]
 
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold text-white mb-8">Films à l'affiche</h1>
-      
-      <MovieGrid movies={movies} />
+    <div>
+      <Hero {...featuredMovie} />
+
+      <div className="p-8">
+        <h2 className="text-3xl font-bold text-white mb-8">Films à l'affiche</h2>
+        
+        <MovieGrid movies={movies} />
+      </div>
     </div>
   )
 }
