@@ -4,6 +4,7 @@ import { fetchMovies } from '../store/slices/moviesSlice'
 import MovieGrid from '../components/movies/MovieGrid'
 import MovieSearch from '../components/movies/MovieSearch'
 import MovieFilters from '../components/movies/MovieFilters'
+import { motion } from 'framer-motion'
 
 function Movies() {
   const dispatch = useDispatch()
@@ -45,7 +46,13 @@ function Movies() {
   }
 
   return (
-    <div className="container mx-auto px-8 py-12">
+      <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -20 }}
+    transition={{ duration: 0.4 }}
+    className="container mx-auto px-8 py-12"
+  >
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-white mb-2">
           Tous les films
@@ -85,7 +92,7 @@ function Movies() {
           </p>
         </div>
       )}
-    </div>
+      </motion.div>
   )
 }
 

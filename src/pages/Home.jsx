@@ -3,6 +3,7 @@ import Hero from '../components/common/Hero'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchMovies } from '../store/slices/moviesSlice'
+import { motion } from 'framer-motion'
 
 function Home() {
   const dispatch = useDispatch()
@@ -41,49 +42,28 @@ function Home() {
 
 
       return (
-        <div>
-          {featuredMovie && (
-            <Hero
-              id={featuredMovie.id}
-              title={featuredMovie.title}
-              description={featuredMovie.synopsis}
-              imageUrl={featuredMovie.imageUrl}
-            />
-          )}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {featuredMovie && (
+              <Hero
+                id={featuredMovie.id}
+                title={featuredMovie.title}
+                description={featuredMovie.synopsis}
+                imageUrl={featuredMovie.imageUrl}
+              />
+            )}
 
           <div className="p-8">
             <h2 className="text-3xl font-bold text-white mb-8">Films à l'affiche</h2>
             
             <MovieGrid movies={movies} />
           </div>
-        </div>
+        </motion.div>
       )
     }
 
 export default Home
-
-// import MovieCard from '../components/movies/MovieCard'
-
-// function Home() {
-//     const testMovie = {
-//     id: 1,
-//     title: "Inception",
-//     imageUrl: "https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
-//     rating: "8.8",
-//     genre: "Sci-Fi"
-//   }
-
-//   return (
-//     <div className="p-8">
-//       <h1 className="text-4xl font-bold text-white mb-8">Films à l'affiche</h1>
-      
-//       <div className="flex gap-4">
-//         <MovieCard {...testMovie} />
-//         <MovieCard {...testMovie} id={2} title="The Dark Knight" />
-//         <MovieCard {...testMovie} id={3} title="Interstellar" />
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default Home

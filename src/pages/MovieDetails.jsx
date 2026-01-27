@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchMovies } from '../store/slices/moviesSlice'
 import { Play, Clock, Calendar, Star, ArrowLeft } from 'lucide-react'
+import { motion } from 'framer-motion'
+
 
 function MovieDetails() {
   const { id } = useParams()
@@ -49,7 +51,12 @@ function MovieDetails() {
   }
 
   return (
-    <div>
+    <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.5 }}
+  >
       {/* Hero Section */}
       <div className="relative h-[60vh] w-full">
         <div className="absolute inset-0">
@@ -130,7 +137,7 @@ function MovieDetails() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
