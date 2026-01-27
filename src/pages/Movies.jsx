@@ -1,22 +1,32 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchMovies } from '../store/slices/moviesSlice'
 import MovieGrid from '../components/movies/MovieGrid'
 import MovieSearch from '../components/movies/MovieSearch'
+import MovieFilters from '../components/movies/MovieFilters'
 
 function Movies() {
   const dispatch = useDispatch()
   const { movies, loading, error } = useSelector((state) => state.movies)
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedGenre, setSelectedGenre] = useState('all')
 
   useEffect(() => {
     dispatch(fetchMovies())
   }, [dispatch])
 
-  // Filter movies based on search
-  const filteredMovies = movies.filter((movie) =>
-    movie.title.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  // Get unique genres from movies
+  const genres = useMemo(() => {
+    const allGenres = movies.map((movie) => movie.genre)
+    return [...new Set(allGenres)]
+  }, [movies])
+
+  // Filter movies based on search and genre
+  const filteredMovies = movies.filter((movie) => {
+    const matchesSearch = movie.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesGenre = selectedGenre === 'all' || movie.genre === selectedGenre
+    return matchesSearch && matchesGenre
+  })
 
   if (loading) {
     return (
@@ -44,18 +54,34 @@ function Movies() {
           Découvrez notre sélection de {movies.length} films
         </p>
         
-        <MovieSearch 
-          searchTerm={searchTerm} 
-          onSearchChange={setSearchTerm} 
-        />
+        <div className="space-y-6">
+          <MovieSearch 
+            searchTerm={searchTerm} 
+            onSearchChange={setSearchTerm} 
+          />
+          
+          <div>
+            <h3 className="text-white font-semibold mb-3">Filtrer par genre</h3>
+            <MovieFilters
+              genres={genres}
+              selectedGenre={selectedGenre}
+              onGenreChange={setSelectedGenre}
+            />
+          </div>
+        </div>
       </div>
 
       {filteredMovies.length > 0 ? (
-        <MovieGrid movies={filteredMovies} />
+        <div>
+          <p className="text-gray-400 mb-4">
+            {filteredMovies.length} film{filteredMovies.length > 1 ? 's' : ''} trouvé{filteredMovies.length > 1 ? 's' : ''}
+          </p>
+          <MovieGrid movies={filteredMovies} />
+        </div>
       ) : (
         <div className="text-center py-12">
           <p className="text-gray-400 text-lg">
-            Aucun film trouvé pour "{searchTerm}"
+            Aucun film trouvé
           </p>
         </div>
       )}
