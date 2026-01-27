@@ -5,8 +5,8 @@ import { movieService } from '../../services/movieService'
 export const fetchMovies = createAsyncThunk(
   'movies/fetchMovies',
   async () => {
-    const response = await movieService.getAllMovies()
-    return response.data
+    const data = await movieService.getAllMovies()
+    return data
   }
 )
 

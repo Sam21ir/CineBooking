@@ -1,67 +1,64 @@
 import MovieGrid from '../components/movies/MovieGrid'
 import Hero from '../components/common/Hero'
-
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchMovies } from '../store/slices/moviesSlice'
 
 function Home() {
-    // Featured movie for Hero
-  const featuredMovie = {
-    id: 1,
-    title: "Inception",
-    description: "Un voleur qui s'introduit dans les rêves des gens pour voler leurs secrets se voit confier une mission impossible : implanter une idée dans l'esprit d'un PDG.",
-    imageUrl: "https://image.tmdb.org/t/p/original/s3TBrRGB1iav7gFOCNx3H31MoES.jpg"
-  }
+  const dispatch = useDispatch()
+  const { movies, loading, error } = useSelector((state) => state.movies)
 
-  // Dummy data for testing
-  const movies = [
-    {
-      id: 1,
-      title: "Inception",
-      imageUrl: "https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
-      rating: "8.8",
-      genre: "Sci-Fi"
-    },
-    {
-      id: 2,
-      title: "The Dark Knight",
-      imageUrl: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-      rating: "9.0",
-      genre: "Action"
-    },
-    {
-      id: 3,
-      title: "Interstellar",
-      imageUrl: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-      rating: "8.6",
-      genre: "Sci-Fi"
-    },
-    {
-      id: 4,
-      title: "The Matrix",
-      imageUrl: "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
-      rating: "8.7",
-      genre: "Sci-Fi"
-    },
-    {
-      id: 5,
-      title: "Pulp Fiction",
-      imageUrl: "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
-      rating: "8.9",
-      genre: "Crime"
+  useEffect(() => {
+    dispatch(fetchMovies())
+  }, [dispatch])
+
+  // Featured movie (first one from API)
+  const featuredMovie = movies && movies.length > 0 ? movies[0] : null
+
+    if (loading) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <p className="text-white text-2xl">Chargement des films...</p>
+        </div>
+      )
     }
-  ]
 
-  return (
-    <div>
-      <Hero {...featuredMovie} />
+    if (error) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <p className="text-red-500 text-2xl">Erreur: {error}</p>
+        </div>
+      )
+    }
 
-      <div className="p-8">
-        <h2 className="text-3xl font-bold text-white mb-8">Films à l'affiche</h2>
-        
-        <MovieGrid movies={movies} />
-      </div>
-    </div>
-  )
-}
+    if (!movies || movies.length === 0) {
+      return (
+        <div className="flex items-center justify-center min-h-screen">
+          <p className="text-gray-400 text-2xl">Aucun film disponible</p>
+        </div>
+      )
+    }
+
+
+      return (
+        <div>
+          {featuredMovie && (
+            <Hero
+              id={featuredMovie.id}
+              title={featuredMovie.title}
+              description={featuredMovie.synopsis}
+              imageUrl={featuredMovie.imageUrl}
+            />
+          )}
+
+          <div className="p-8">
+            <h2 className="text-3xl font-bold text-white mb-8">Films à l'affiche</h2>
+            
+            <MovieGrid movies={movies} />
+          </div>
+        </div>
+      )
+    }
 
 export default Home
 
