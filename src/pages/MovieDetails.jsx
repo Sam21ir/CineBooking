@@ -106,7 +106,10 @@ function MovieDetails() {
             </p>
 
             <div className="flex gap-4">
-              <button className="flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary-dark transition font-semibold">
+              <button 
+                onClick={() => navigate(`/sessions/${movie.id}`)}
+                className="flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary-dark transition font-semibold"
+              >
                 <Play className="w-5 h-5" />
                 Réserver
               </button>

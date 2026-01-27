@@ -5,6 +5,7 @@ import MovieDetails from './pages/MovieDetails'
 import Header from './components/common/Header'
 import Footer from './components/common/Footer'
 import { AnimatePresence } from 'framer-motion'
+import SessionSelection from './pages/SessionSelection'
 
 function AnimatedRoutes() {
   const location = useLocation()
@@ -15,6 +16,7 @@ function AnimatedRoutes() {
         <Route path="/" element={<Home />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/movies/:id" element={<MovieDetails />} />
+        <Route path="/sessions/:id" element={<SessionSelection />} />
       </Routes>
     </AnimatePresence>
   )
