@@ -18,6 +18,8 @@ function SeatSelection() {
   const { movies } = useSelector((state) => state.movies)
   const { sessions } = useSelector((state) => state.sessions)
   const { seats, selectedSeats, loading } = useSelector((state) => state.seats)
+  console.log('Seats data:', seats)
+  console.log('Session ID:', sessionId)
 
   const session = sessions.find((s) => s.id === sessionId)
   const movie = movies.find((m) => m.id === session?.movieId)
@@ -37,8 +39,27 @@ function SeatSelection() {
   }
 
   const handleProceed = () => {
-    // TODO: Navigate to checkout
-    alert('Redirection vers le paiement - À implémenter!')
+  const seatsDetails = selectedSeats.map(seatId =>
+    seats.find(seat => seat.id === seatId)
+    ).filter(Boolean)
+
+  const calculateTotal = () => {
+    const basePrice = session?.price || 0
+    return seatsDetails.reduce((total, seat) => {
+      if (seat.type === 'premium') return total + basePrice + 3
+      return total + basePrice
+      }, 0)
+    }
+
+    navigate('/checkout', {
+      state: {
+        movie,
+        session,
+        selectedSeats,
+        seats,
+        total: calculateTotal()
+      }
+    })
   }
 
   if (loading) {

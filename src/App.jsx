@@ -7,6 +7,8 @@ import Footer from './components/common/Footer'
 import { AnimatePresence } from 'framer-motion'
 import SessionSelection from './pages/SessionSelection'
 import SeatSelection from './pages/SeatSelection'
+import Checkout from './pages/Checkout'
+import Confirmation from './pages/Confirmation'
 
 
 
@@ -21,6 +23,8 @@ function AnimatedRoutes() {
         <Route path="/movies/:id" element={<MovieDetails />} />
         <Route path="/sessions/:id" element={<SessionSelection />} />
         <Route path="/booking/:sessionId" element={<SeatSelection />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/confirmation" element={<Confirmation />} />
       </Routes>
     </AnimatePresence>
   )
