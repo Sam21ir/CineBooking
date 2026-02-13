@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchTrendingMovies } from '../../store/slices/recommendationsSlice';
+import { isAIAvailable } from '../../services/aiService';
 import { Movie } from '../../store/slices/moviesSlice';
 import { MovieRow } from './MovieRow';
 
@@ -13,6 +14,11 @@ interface TrendingSectionProps {
 export function TrendingSection({ movies }: TrendingSectionProps) {
   const dispatch = useAppDispatch();
   const { trendingMovies, loading } = useAppSelector((state) => state.recommendations);
+
+  // Don't render if AI is not available
+  if (!isAIAvailable()) {
+    return null;
+  }
 
   useEffect(() => {
     if (movies.length > 0 && trendingMovies.length === 0) {
@@ -48,7 +54,7 @@ export function TrendingSection({ movies }: TrendingSectionProps) {
         <TrendingUp className="w-5 h-5 text-red-500" />
         <h2 className="text-2xl font-bold text-white">Tendances IA</h2>
         <span className="text-xs text-red-500 bg-red-500/10 px-2 py-1 rounded">
-          Powered by Claude AI
+          Powered by Gemini AI
         </span>
       </div>
       <MovieRow title="" movies={trendingMovies} />

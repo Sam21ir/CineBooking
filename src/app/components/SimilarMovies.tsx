@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Shuffle } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchSimilarMovies } from '../../store/slices/recommendationsSlice';
+import { isAIAvailable } from '../../services/aiService';
 import { Movie } from '../../store/slices/moviesSlice';
 import { MovieRow } from './MovieRow';
 
@@ -14,6 +15,11 @@ interface SimilarMoviesProps {
 export function SimilarMovies({ movie, allMovies }: SimilarMoviesProps) {
   const dispatch = useAppDispatch();
   const { similarMovies, loading } = useAppSelector((state) => state.recommendations);
+
+  // Don't render if AI is not available
+  if (!isAIAvailable()) {
+    return null;
+  }
 
   useEffect(() => {
     if (movie && allMovies.length > 0) {

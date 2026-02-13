@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchPersonalizedRecommendations } from '../../store/slices/recommendationsSlice';
+import { isAIAvailable } from '../../services/aiService';
 import { MovieRow } from './MovieRow';
 
 interface RecommendedMoviesProps {
@@ -16,6 +17,11 @@ interface RecommendedMoviesProps {
 export function RecommendedMovies({ movies, userPreferences }: RecommendedMoviesProps) {
   const dispatch = useAppDispatch();
   const { recommendedMovies, loading } = useAppSelector((state) => state.recommendations);
+
+  // Don't render if AI is not available
+  if (!isAIAvailable()) {
+    return null;
+  }
 
   useEffect(() => {
     if (movies.length > 0 && recommendedMovies.length === 0) {
@@ -54,7 +60,7 @@ export function RecommendedMovies({ movies, userPreferences }: RecommendedMovies
         <Sparkles className="w-5 h-5 text-yellow-500" />
         <h2 className="text-2xl font-bold text-white">Recommandations IA</h2>
         <span className="text-xs text-yellow-500 bg-yellow-500/10 px-2 py-1 rounded">
-          Powered by Claude AI
+          Powered by Gemini AI
         </span>
       </div>
       <MovieRow title="" movies={recommendedMovies} />

@@ -7,6 +7,7 @@ import { fetchMovieById, fetchMovies } from '../store/slices/moviesSlice';
 import { fetchSessionsByMovieId } from '../store/slices/sessionsSlice';
 import { toggleMyList } from '../store/slices/myListSlice';
 import { fetchAISynopsis } from '../store/slices/recommendationsSlice';
+import { isAIAvailable } from '../services/aiService';
 import { SimilarMovies } from '../app/components/SimilarMovies';
 import toast from 'react-hot-toast';
 import { Header } from '../app/components/Header';
@@ -45,7 +46,7 @@ export default function MovieDetails() {
   }, [dispatch, id, allMovies.length]);
 
   useEffect(() => {
-    if (selectedMovie && !aiSynopsis[selectedMovie.id]) {
+    if (selectedMovie && !aiSynopsis[selectedMovie.id] && isAIAvailable()) {
       dispatch(fetchAISynopsis(selectedMovie));
     }
   }, [dispatch, selectedMovie, aiSynopsis]);
