@@ -80,15 +80,26 @@ export default function Checkout() {
       
       // Send webhook to n8n for email notification and QR code processing
       if (selectedSession && selectedMovie) {
+        console.log('🚀 Attempting to send webhook...');
         sendBookingConfirmationWebhook(
           createdBooking,
           selectedMovie.title,
           selectedSession.date,
           selectedSession.time
-        ).catch(err => {
-          console.error('Webhook failed (non-critical):', err);
+        )
+        .then(result => {
+          if (result) {
+            console.log('✅ Webhook completed successfully');
+          } else {
+            console.warn('⚠️ Webhook returned null (check console for errors)');
+          }
+        })
+        .catch(err => {
+          console.error('❌ Webhook failed (non-critical):', err);
           // Don't show error to user - webhook is optional
         });
+      } else {
+        console.warn('⚠️ Cannot send webhook: missing session or movie data');
       }
       
       navigate('/confirmation');

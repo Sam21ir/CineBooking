@@ -12,6 +12,9 @@ const N8N_SESSION_REMINDER_WEBHOOK = import.meta.env.VITE_N8N_REMINDER_WEBHOOK |
  * This will trigger n8n workflow for email notification and QR code generation
  */
 export async function sendBookingConfirmationWebhook(booking: Booking, movieTitle: string, sessionDate: string, sessionTime: string) {
+  // Log webhook URL for debugging
+  console.log('🔗 Webhook URL:', N8N_BOOKING_CONFIRMATION_WEBHOOK);
+  
   try {
     const payload = {
       bookingId: booking.id,
@@ -28,6 +31,8 @@ export async function sendBookingConfirmationWebhook(booking: Booking, movieTitl
       status: booking.status,
     };
 
+    console.log('📤 Sending webhook payload:', payload);
+
     const response = await axios.post(N8N_BOOKING_CONFIRMATION_WEBHOOK, payload, {
       headers: {
         'Content-Type': 'application/json',
@@ -35,9 +40,27 @@ export async function sendBookingConfirmationWebhook(booking: Booking, movieTitl
       timeout: 5000, // 5 second timeout
     });
 
+    console.log('✅ Webhook sent successfully! Response:', response.data);
     return response.data;
-  } catch (error) {
-    console.error('Failed to send booking confirmation webhook:', error);
+  } catch (error: any) {
+    console.error('❌ Failed to send booking confirmation webhook:', error);
+    
+    // More detailed error logging
+    if (error.response) {
+      console.error('📛 Response error:', {
+        status: error.response.status,
+        statusText: error.response.statusText,
+        data: error.response.data,
+      });
+    } else if (error.request) {
+      console.error('📛 Request error:', {
+        message: 'No response received from server',
+        url: N8N_BOOKING_CONFIRMATION_WEBHOOK,
+      });
+    } else {
+      console.error('📛 Error:', error.message);
+    }
+    
     // Don't throw - webhook failure shouldn't break booking flow
     return null;
   }
