@@ -13,7 +13,7 @@ const genAI = (API_KEY && API_KEY.trim() && API_KEY !== 'your-api-key-here')
  * FIXED: Changed from 'gemini-pro' to 'gemini-1.5-flash'
  * gemini-1.5-flash is faster, more reliable, and has a generous free tier.
  */
-const MODEL_NAME = 'gemini-1.5-flash';
+const MODEL_NAME = 'gemini-2.5-flash';
 
 export function isAIAvailable(): boolean {
   return genAI !== null;
