@@ -5,6 +5,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  password?: string; // Password stored for MockAPI (in production, this would be hashed on backend)
   avatar?: string;
 }
 

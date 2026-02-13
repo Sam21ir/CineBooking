@@ -103,12 +103,16 @@ export const userApi = {
   },
 
   login: async (email: string, password: string): Promise<User | null> => {
-    // In a real app, this would be a proper login endpoint
-    // For MockAPI, we'll search for a user with matching email
+    // In a real app, this would be a proper login endpoint with password hashing
+    // For MockAPI, we'll search for a user with matching email AND password
     const users = await userApi.getUsers();
-    const user = users.find(u => u.email === email);
-    // In production, verify password hash here
-    return user || null;
+    const user = users.find(u => u.email === email && u.password === password);
+    if (!user) {
+      return null;
+    }
+    // Return user without password for security
+    const { password: _, ...userWithoutPassword } = user;
+    return userWithoutPassword as User;
   },
 
   register: async (name: string, email: string, password: string): Promise<User> => {
@@ -119,13 +123,17 @@ export const userApi = {
       throw new Error('User with this email already exists');
     }
     
-    // Create new user (password would be hashed in production)
+    // Create new user with password
+    // In production, password would be hashed on the backend
     const newUser = await userApi.createUser({
       name,
       email,
-      // In production, store hashed password separately
+      password, // Store password for MockAPI (in production, this would be hashed)
     });
-    return newUser;
+    
+    // Return user without password for security
+    const { password: _, ...userWithoutPassword } = newUser;
+    return userWithoutPassword as User;
   },
 };
 
