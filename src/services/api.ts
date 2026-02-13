@@ -2,10 +2,12 @@ import axios from 'axios';
 import type { Movie, Session } from '../store/slices/moviesSlice';
 import type { Seat } from '../store/slices/seatsSlice';
 import type { Booking } from '../store/slices/bookingsSlice';
+import type { User } from '../store/slices/usersSlice';
 
 // API Base URLs
 const MOVIES_API_BASE_URL = 'https://69765d19c0c36a2a9950ecb3.mockapi.io';
 const BOOKINGS_API_BASE_URL = 'https://69792073cd4fe130e3db380e.mockapi.io';
+const USERS_API_BASE_URL = 'https://698d4a76b79d1c928ed4e75e.mockapi.io';
 
 // Movies & Sessions API
 const moviesApiClient = axios.create({
@@ -18,6 +20,14 @@ const moviesApiClient = axios.create({
 // Bookings & Seats API
 const bookingsApiClient = axios.create({
   baseURL: BOOKINGS_API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Users API
+const usersApiClient = axios.create({
+  baseURL: USERS_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -67,6 +77,55 @@ export const bookingApi = {
   getBookingById: async (id: string): Promise<Booking> => {
     const response = await bookingsApiClient.get<Booking>(`/bookings/${id}`);
     return response.data;
+  },
+};
+
+// Users API
+export const userApi = {
+  getUsers: async (): Promise<User[]> => {
+    const response = await usersApiClient.get<User[]>('/users');
+    return response.data;
+  },
+
+  getUserById: async (id: string): Promise<User> => {
+    const response = await usersApiClient.get<User>(`/users/${id}`);
+    return response.data;
+  },
+
+  createUser: async (userData: Omit<User, 'id'>): Promise<User> => {
+    const response = await usersApiClient.post<User>('/users', userData);
+    return response.data;
+  },
+
+  updateUser: async (id: string, userData: Partial<User>): Promise<User> => {
+    const response = await usersApiClient.put<User>(`/users/${id}`, userData);
+    return response.data;
+  },
+
+  login: async (email: string, password: string): Promise<User | null> => {
+    // In a real app, this would be a proper login endpoint
+    // For MockAPI, we'll search for a user with matching email
+    const users = await userApi.getUsers();
+    const user = users.find(u => u.email === email);
+    // In production, verify password hash here
+    return user || null;
+  },
+
+  register: async (name: string, email: string, password: string): Promise<User> => {
+    // Check if user already exists
+    const existingUsers = await userApi.getUsers();
+    const existingUser = existingUsers.find(u => u.email === email);
+    if (existingUser) {
+      throw new Error('User with this email already exists');
+    }
+    
+    // Create new user (password would be hashed in production)
+    const newUser = await userApi.createUser({
+      name,
+      email,
+      // In production, store hashed password separately
+    });
+    return newUser;
   },
 };
 

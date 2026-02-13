@@ -9,7 +9,11 @@ import Sessions from '../pages/Sessions';
 import Booking from '../pages/Booking';
 import Checkout from '../pages/Checkout';
 import Confirmation from '../pages/Confirmation';
+import Profile from '../pages/Profile';
 import NotFound from '../pages/NotFound';
+import { LoginForm } from './components/LoginForm';
+import { RegisterForm } from './components/RegisterForm';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 export default function App() {
   const location = useLocation();
@@ -26,6 +30,16 @@ export default function App() {
         <Route path="/booking/:sessionId" element={<Booking />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/confirmation" element={<Confirmation />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>

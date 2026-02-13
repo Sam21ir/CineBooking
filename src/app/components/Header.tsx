@@ -1,18 +1,35 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Search, Bell, User } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Search, Bell, User, LogOut, UserCircle } from 'lucide-react';
 import { SearchModal } from './SearchModal';
 import { NotificationsModal } from './NotificationsModal';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMovies } from '../../store/slices/moviesSlice';
+import { logout } from '../../store/slices/usersSlice';
+import { loadUserFromStorage } from '../../store/slices/usersSlice';
+import toast from 'react-hot-toast';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 export function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { movies } = useAppSelector((state) => state.movies);
   const { unreadCount } = useAppSelector((state) => state.notifications);
+  const { currentUser, isAuthenticated } = useAppSelector((state) => state.users);
+
+  // Load user from localStorage on mount
+  useEffect(() => {
+    dispatch(loadUserFromStorage());
+  }, [dispatch]);
 
   // Fetch movies if not loaded when opening search
   useEffect(() => {
@@ -20,6 +37,12 @@ export function Header() {
       dispatch(fetchMovies());
     }
   }, [searchOpen, movies.length, dispatch]);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    toast.success('Logged out successfully');
+    navigate('/');
+  };
 
   return (
     <>
@@ -85,9 +108,48 @@ export function Header() {
                 </span>
               )}
             </button>
-            <button className="text-white hover:text-gray-300 transition">
-              <User className="w-5 h-5" />
-            </button>
+            {isAuthenticated && currentUser ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="text-white hover:text-gray-300 transition flex items-center gap-2">
+                    {currentUser.avatar ? (
+                      <img
+                        src={currentUser.avatar}
+                        alt={currentUser.name}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-5 h-5" />
+                    )}
+                    <span className="hidden md:inline text-sm">{currentUser.name}</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-gray-900 border-gray-800 text-white">
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
+                      <UserCircle className="w-4 h-4" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-gray-800" />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 cursor-pointer text-red-500 focus:text-red-600"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link
+                to="/login"
+                className="text-white hover:text-gray-300 transition flex items-center gap-2"
+              >
+                <User className="w-5 h-5" />
+                <span className="hidden md:inline text-sm">Login</span>
+              </Link>
+            )}
           </div>
         </div>
       </header>

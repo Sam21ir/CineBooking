@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, Star, Play, Plus, Check } from 'lucide-react';
+import { Calendar, Clock, Star, Play, Plus, Check, Sparkles } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchMovieById, fetchMovies } from '../store/slices/moviesSlice';
 import { fetchSessionsByMovieId } from '../store/slices/sessionsSlice';
 import { toggleMyList } from '../store/slices/myListSlice';
+import { fetchAISynopsis } from '../store/slices/recommendationsSlice';
+import { SimilarMovies } from '../app/components/SimilarMovies';
 import toast from 'react-hot-toast';
 import { Header } from '../app/components/Header';
 import { Button } from '../app/components/ui/button';
@@ -14,10 +16,12 @@ export default function MovieDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { selectedMovie, loading: movieLoading } = useAppSelector((state) => state.movies);
+  const { selectedMovie, loading: movieLoading, movies: allMovies } = useAppSelector((state) => state.movies);
   const { sessions, loading: sessionsLoading } = useAppSelector((state) => state.sessions);
   const { movies: myList } = useAppSelector((state) => state.myList);
+  const { aiSynopsis } = useAppSelector((state) => state.recommendations);
   const isInMyList = selectedMovie ? myList.some(m => m.id === selectedMovie.id) : false;
+  const [useAISynopsis, setUseAISynopsis] = useState(false);
 
   const handleToggleMyList = () => {
     if (selectedMovie) {
@@ -34,8 +38,23 @@ export default function MovieDetails() {
     if (id) {
       dispatch(fetchMovieById(id));
       dispatch(fetchSessionsByMovieId(id));
+      if (allMovies.length === 0) {
+        dispatch(fetchMovies());
+      }
     }
-  }, [dispatch, id]);
+  }, [dispatch, id, allMovies.length]);
+
+  useEffect(() => {
+    if (selectedMovie && !aiSynopsis[selectedMovie.id]) {
+      dispatch(fetchAISynopsis(selectedMovie));
+    }
+  }, [dispatch, selectedMovie, aiSynopsis]);
+
+  const displaySynopsis = selectedMovie
+    ? (useAISynopsis && aiSynopsis[selectedMovie.id])
+      ? aiSynopsis[selectedMovie.id]
+      : selectedMovie.synopsis
+    : '';
 
   if (movieLoading) {
     return (
@@ -95,7 +114,22 @@ export default function MovieDetails() {
                   <span>{new Date(selectedMovie.releaseDate).getFullYear()}</span>
                 </div>
               </div>
-              <p className="text-gray-300 mb-6 leading-relaxed">{selectedMovie.synopsis}</p>
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-gray-300 leading-relaxed">{displaySynopsis}</p>
+                  {aiSynopsis[selectedMovie.id] && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setUseAISynopsis(!useAISynopsis)}
+                      className="text-xs text-yellow-500 hover:text-yellow-400 flex items-center gap-1"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      {useAISynopsis ? 'Original' : 'IA'}
+                    </Button>
+                  )}
+                </div>
+              </div>
               <div className="mb-6">
                 <span className="px-3 py-1 bg-red-600 rounded-full text-sm">
                   {selectedMovie.genre}
@@ -139,6 +173,13 @@ export default function MovieDetails() {
               </div>
             </motion.div>
           </div>
+          
+          {/* Similar Movies Section */}
+          {selectedMovie && allMovies.length > 0 && (
+            <div className="mt-12">
+              <SimilarMovies movie={selectedMovie} allMovies={allMovies} />
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

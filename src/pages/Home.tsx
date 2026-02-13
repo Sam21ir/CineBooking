@@ -6,12 +6,16 @@ import { fetchMovies } from '../store/slices/moviesSlice';
 import { Header } from '../app/components/Header';
 import { Hero } from '../app/components/Hero';
 import { MovieRow } from '../app/components/MovieRow';
+import { TrendingSection } from '../app/components/TrendingSection';
+import { RecommendedMovies } from '../app/components/RecommendedMovies';
 import { Footer } from '../app/components/Footer';
 
 export default function Home() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { movies, loading } = useAppSelector((state) => state.movies);
+  const { movies: myList } = useAppSelector((state) => state.myList);
+  const { currentUser } = useAppSelector((state) => state.users);
 
   useEffect(() => {
     if (movies.length === 0) {
@@ -47,10 +51,25 @@ export default function Home() {
           <div className="text-center text-white py-12">Chargement des films...</div>
         ) : (
           <>
-            {trendingMovies.length > 0 && (
-              <MovieRow title="Tendances" movies={trendingMovies} />
+            {/* AI-Powered Trending Section */}
+            {movies.length > 0 && (
+              <TrendingSection movies={movies} />
             )}
-            {popularMovies.length > 0 && (
+            
+            {/* AI Personalized Recommendations (if user is logged in) */}
+            {currentUser && movies.length > 0 && (
+              <RecommendedMovies
+                movies={movies}
+                userPreferences={{
+                  favoriteGenres: myList.length > 0
+                    ? [...new Set(myList.map(m => m.genre))]
+                    : undefined,
+                  favoriteMovies: myList.map(m => m.title),
+                }}
+              />
+            )}
+            
+            {trendingMovies.length > 0 && (
               <MovieRow title="Populaires sur CineBooking" movies={popularMovies} />
             )}
             {newReleases.length > 0 && (

@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { createBooking } from '../store/slices/bookingsSlice';
 import { clearSelectedSeats } from '../store/slices/seatsSlice';
+import { sendBookingConfirmationWebhook } from '../services/webhookService';
 import { Header } from '../app/components/Header';
 import { Button } from '../app/components/ui/button';
 import { Input } from '../app/components/ui/input';
@@ -74,8 +75,22 @@ export default function Checkout() {
     };
 
     try {
-      await dispatch(createBooking(bookingData)).unwrap();
+      const createdBooking = await dispatch(createBooking(bookingData)).unwrap();
       dispatch(clearSelectedSeats());
+      
+      // Send webhook to n8n for email notification and QR code processing
+      if (selectedSession && selectedMovie) {
+        sendBookingConfirmationWebhook(
+          createdBooking,
+          selectedMovie.title,
+          selectedSession.date,
+          selectedSession.time
+        ).catch(err => {
+          console.error('Webhook failed (non-critical):', err);
+          // Don't show error to user - webhook is optional
+        });
+      }
+      
       navigate('/confirmation');
       toast.success('Booking confirmed!');
     } catch (error) {
