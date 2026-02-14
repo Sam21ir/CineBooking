@@ -15,10 +15,16 @@ export default function Booking() {
 
   useEffect(() => {
     if (sessionId) {
+      console.log('🪑 Fetching seats for sessionId:', sessionId);
       dispatch(fetchSeats(sessionId));
     }
     // Don't clear seats on unmount - they're needed for checkout
   }, [dispatch, sessionId]);
+  
+  useEffect(() => {
+    console.log('🪑 Current seats:', seats.length, 'seats loaded');
+    console.log('🪑 Session ID:', sessionId);
+  }, [seats, sessionId]);
 
   const handleSeatClick = (seatId: string) => {
     dispatch(toggleSeatSelection(seatId));
@@ -60,6 +66,13 @@ export default function Booking() {
         
         {loading ? (
           <div className="text-center text-white py-12">Loading seats...</div>
+        ) : seats.length === 0 ? (
+          <div className="text-center text-white py-12">
+            <p className="text-xl mb-4">No seats available for this session</p>
+            <Button onClick={() => navigate(-1)} className="bg-red-600 hover:bg-red-700">
+              Go Back
+            </Button>
+          </div>
         ) : (
           <>
             <div className="mb-8 flex justify-center">

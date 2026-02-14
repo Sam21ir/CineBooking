@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchMovies } from '../store/slices/moviesSlice';
 import { Header } from '../app/components/Header';
+import { Footer } from '../app/components/Footer';
 import { MovieCard } from '../app/components/MovieCard';
 
 export default function Movies() {
@@ -35,6 +36,7 @@ export default function Movies() {
           </div>
         )}
       </div>
+      <Footer />
     </motion.div>
   );
 }

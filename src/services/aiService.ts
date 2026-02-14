@@ -10,10 +10,10 @@ const genAI = (API_KEY && API_KEY.trim() && API_KEY !== 'your-api-key-here')
   : null;
 
 /** 
- * FIXED: Changed from 'gemini-pro' to 'gemini-1.5-flash'
- * gemini-1.5-flash is faster, more reliable, and has a generous free tier.
+ * Using 'gemini-1.5-flash' - faster, more reliable, and has a generous free tier.
+ * Alternative: 'gemini-pro' for better quality (slower, more expensive)
  */
-const MODEL_NAME = 'gemini-2.5-flash';
+const MODEL_NAME = 'gemini-1.5-flash';
 
 export function isAIAvailable(): boolean {
   return genAI !== null;
@@ -43,38 +43,53 @@ export async function getPersonalizedRecommendations(
   request: AIRecommendationRequest
 ): Promise<Movie[]> {
   if (!isAIAvailable() || !genAI) {
-    return request.movies.sort((a, b) => b.rating - a.rating).slice(0, 5);
+    console.log('🤖 AI not available, using fallback recommendations');
+    // Shuffle and return varied recommendations
+    const shuffled = [...request.movies].sort(() => Math.random() - 0.5);
+    return shuffled
+      .sort((a, b) => b.rating - a.rating)
+      .slice(0, 5);
   }
 
   try {
     const { movies, userPreferences } = request;
-    const moviesList = movies.map(m => ({
+    // Shuffle movies to get different results each time
+    const shuffled = [...movies].sort(() => Math.random() - 0.5);
+    const moviesList = shuffled.map(m => ({
       title: m.title,
       genre: m.genre,
       rating: m.rating,
       synopsis: m.synopsis.substring(0, 150),
     })).slice(0, 20);
 
-    const prompt = `You are a movie recommendation expert. Based on the available movies below and user preferences, recommend 5 movies.
-    
-    Available Movies: ${JSON.stringify(moviesList)}
-    User Genres: ${userPreferences?.favoriteGenres?.join(', ') || 'Any'}
-    
-    Return ONLY a raw JSON array of titles. Example: ["Movie A", "Movie B"]`;
+    console.log('🤖 Calling AI for personalized recommendations...');
+    const prompt = `You are a movie recommendation expert. Based on the available movies below and user preferences, recommend 5 DIFFERENT movies that the user would enjoy. Try to vary the genres and ratings.
+
+Available Movies: ${JSON.stringify(moviesList)}
+User Genres: ${userPreferences?.favoriteGenres?.join(', ') || 'Any'}
+User Favorite Movies: ${userPreferences?.favoriteMovies?.join(', ') || 'None'}
+
+IMPORTANT: Return 5 DIFFERENT movies, not just the highest rated ones. Consider variety in genres and ratings.
+Return ONLY a raw JSON array of titles. Example: ["Movie A", "Movie B", "Movie C", "Movie D", "Movie E"]`;
 
     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
     const result = await model.generateContent(prompt);
     const text = cleanJsonReadyText(result.response.text());
+    console.log('🤖 AI Response:', text);
 
     const jsonMatch = text.match(/\[.*\]/s);
     if (jsonMatch) {
       const titles = JSON.parse(jsonMatch[0]) as string[];
-      return titles.map(t => movies.find(m => m.title === t)).filter((m): m is Movie => !!m);
+      const recommended = titles.map(t => movies.find(m => m.title === t)).filter((m): m is Movie => !!m);
+      console.log('🤖 Recommended movies:', recommended.map(m => m.title));
+      return recommended;
     }
     throw new Error("Invalid JSON format");
   } catch (error) {
-    console.error('AI Error:', error);
-    return request.movies.slice(0, 5);
+    console.error('🤖 AI Error:', error);
+    // Fallback with shuffle for variety
+    const shuffled = [...request.movies].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 5);
   }
 }
 
@@ -122,21 +137,62 @@ export async function generateAISynopsis(movie: Movie): Promise<string> {
 export async function getTrendingMovies(movies: Movie[]): Promise<Movie[]> {
     // Basic fallback logic
     if (!isAIAvailable() || !genAI) {
-        return [...movies].sort((a, b) => b.rating - a.rating).slice(0, 5);
+        console.log('🤖 AI not available, using fallback trending movies');
+        // Shuffle and return varied trending movies
+        const shuffled = [...movies].sort(() => Math.random() - 0.5);
+        return shuffled
+          .sort((a, b) => {
+            // Consider both rating and recency
+            const ratingDiff = b.rating - a.rating;
+            const dateA = new Date(a.releaseDate).getTime();
+            const dateB = new Date(b.releaseDate).getTime();
+            const recencyDiff = dateB - dateA;
+            return ratingDiff * 0.7 + (recencyDiff / 10000000000) * 0.3;
+          })
+          .slice(0, 5);
     }
     
     try {
+        console.log('🤖 Calling AI for trending movies...');
+        // Shuffle movies to get different results each time
+        const shuffled = [...movies].sort(() => Math.random() - 0.5);
+        const moviesData = shuffled.map(m => ({
+          title: m.title,
+          genre: m.genre,
+          rating: m.rating,
+          releaseDate: m.releaseDate,
+        })).slice(0, 20);
+        
         const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-        const prompt = `Identify the 5 most "trending" looking movies from this list: ${JSON.stringify(movies.map(m => m.title))}. Return ONLY a JSON array of titles.`;
+        const prompt = `Identify the 5 most "trending" movies from this list. Consider:
+- High ratings (but not necessarily the highest)
+- Recent release dates
+- Popular genres
+- Overall appeal
+
+Movies: ${JSON.stringify(moviesData)}
+
+IMPORTANT: Return 5 DIFFERENT trending movies, not just the highest rated. Consider variety.
+Return ONLY a JSON array of titles. Example: ["Movie A", "Movie B", "Movie C", "Movie D", "Movie E"]`;
+        
         const result = await model.generateContent(prompt);
         const text = cleanJsonReadyText(result.response.text());
+        console.log('🤖 AI Response:', text);
+        
         const jsonMatch = text.match(/\[.*\]/s);
         if (jsonMatch) {
             const titles = JSON.parse(jsonMatch[0]) as string[];
-            return titles.map(t => movies.find(m => m.title === t)).filter((m): m is Movie => !!m);
+            const trending = titles.map(t => movies.find(m => m.title === t)).filter((m): m is Movie => !!m);
+            console.log('🤖 Trending movies:', trending.map(m => m.title));
+            return trending;
         }
-        return movies.slice(0, 5);
+        // Fallback with shuffle
+        const shuffledFallback = [...movies].sort(() => Math.random() - 0.5);
+        return shuffledFallback.slice(0, 5);
     } catch (e) {
-        return movies.slice(0, 5);
+        console.error('🤖 AI Error:', e);
+        // Fallback with shuffle
+        const shuffled = [...movies].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, 5);
     }
 }

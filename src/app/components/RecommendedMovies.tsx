@@ -24,13 +24,15 @@ export function RecommendedMovies({ movies, userPreferences }: RecommendedMovies
   }
 
   useEffect(() => {
-    if (movies.length > 0 && recommendedMovies.length === 0) {
+    if (movies.length > 0) {
+      // Always fetch fresh recommendations (don't cache)
+      // This ensures variety each time
       dispatch(fetchPersonalizedRecommendations({
         movies,
         userPreferences,
       }));
     }
-  }, [dispatch, movies, userPreferences, recommendedMovies.length]);
+  }, [dispatch, movies, userPreferences]);
 
   if (loading) {
     return (

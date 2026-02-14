@@ -21,10 +21,12 @@ export function TrendingSection({ movies }: TrendingSectionProps) {
   }
 
   useEffect(() => {
-    if (movies.length > 0 && trendingMovies.length === 0) {
+    if (movies.length > 0) {
+      // Always fetch fresh trending movies (don't cache)
+      // This ensures variety each time
       dispatch(fetchTrendingMovies(movies));
     }
-  }, [dispatch, movies, trendingMovies.length]);
+  }, [dispatch, movies]);
 
   if (loading) {
     return (

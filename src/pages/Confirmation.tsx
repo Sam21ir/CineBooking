@@ -35,14 +35,55 @@ export default function Confirmation() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0 }}
-      className="min-h-screen bg-[#0a0a0a]"
-    >
-      <Header />
-      <div className="container mx-auto px-4 py-12 pt-32">
+    <>
+      {/* Print Styles */}
+      <style>{`
+        @media print {
+          @page {
+            margin: 0;
+            size: A4;
+          }
+          body * {
+            visibility: hidden;
+          }
+          #ticket-card,
+          #ticket-card * {
+            visibility: visible;
+          }
+          #ticket-card {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            background: white !important;
+            color: black !important;
+            padding: 2cm;
+            box-shadow: none;
+            border: none;
+          }
+          #ticket-card .text-white {
+            color: black !important;
+          }
+          #ticket-card .text-gray-400 {
+            color: #666 !important;
+          }
+          #ticket-card .bg-gray-900 {
+            background: white !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+        }
+      `}</style>
+      
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0 }}
+        className="min-h-screen bg-[#0a0a0a]"
+      >
+        <Header />
+        <div className="container mx-auto px-4 py-12 pt-32">
         <div className="max-w-2xl mx-auto text-center">
           <motion.div
             initial={{ scale: 0 }}
@@ -60,7 +101,7 @@ export default function Confirmation() {
             Your tickets have been reserved successfully
           </p>
 
-          <Card className="p-8 bg-gray-900 border-gray-800 mb-6">
+          <Card id="ticket-card" className="p-8 bg-gray-900 border-gray-800 mb-6 print-only">
             <div className="flex flex-col md:flex-row gap-8 items-center">
               <div className="bg-white p-4 rounded-lg">
                 <QRCode value={currentBooking.qrCode} size={200} />
@@ -101,7 +142,7 @@ export default function Confirmation() {
             </div>
           </Card>
 
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center no-print">
             <Button
               onClick={() => window.print()}
               variant="outline"
@@ -119,6 +160,7 @@ export default function Confirmation() {
         </div>
       </div>
     </motion.div>
+    </>
   );
 }
 

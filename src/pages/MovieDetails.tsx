@@ -11,6 +11,7 @@ import { isAIAvailable } from '../services/aiService';
 import { SimilarMovies } from '../app/components/SimilarMovies';
 import toast from 'react-hot-toast';
 import { Header } from '../app/components/Header';
+import { Footer } from '../app/components/Footer';
 import { Button } from '../app/components/ui/button';
 
 export default function MovieDetails() {
@@ -87,12 +88,12 @@ export default function MovieDetails() {
             <motion.div
               initial={{ x: -50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              className="relative"
+              className="relative flex justify-center"
             >
               <img
                 src={selectedMovie.imageUrl}
                 alt={selectedMovie.title}
-                className="w-full rounded-lg"
+                className="w-full max-w-md h-auto rounded-lg object-cover shadow-2xl"
               />
             </motion.div>
             <motion.div
@@ -164,12 +165,16 @@ export default function MovieDetails() {
                     </>
                   )}
                 </Button>
-                {sessions.length > 0 && (
+                {sessions.length > 0 ? (
                   <Link to={`/sessions/${id}`}>
                     <Button className="bg-red-600 hover:bg-red-700">
                       Réserver
                     </Button>
                   </Link>
+                ) : (
+                  <div className="text-yellow-500 text-sm">
+                    Aucune séance disponible pour le moment
+                  </div>
                 )}
               </div>
             </motion.div>
@@ -183,6 +188,7 @@ export default function MovieDetails() {
           )}
         </div>
       </div>
+      <Footer />
     </motion.div>
   );
 }

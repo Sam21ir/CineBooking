@@ -41,7 +41,14 @@ export const fetchSessionsByMovieId = createAsyncThunk(
   'sessions/fetchSessionsByMovieId',
   async (movieId: string) => {
     const response = await movieApi.getSessions();
-    return response.filter((session: Session) => session.movieId === movieId);
+    const filteredSessions = response.filter((session: Session) => session.movieId === movieId);
+    console.log(`🎬 Fetching sessions for movieId: ${movieId}`);
+    console.log(`🎬 Total sessions in API: ${response.length}`);
+    console.log(`🎬 Sessions for this movie: ${filteredSessions.length}`);
+    if (filteredSessions.length === 0) {
+      console.warn(`⚠️ No sessions found for movieId: ${movieId}. Make sure sessions in MockAPI have matching movieId.`);
+    }
+    return filteredSessions;
   }
 );
 

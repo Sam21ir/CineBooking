@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { fetchMovies } from '../../store/slices/moviesSlice';
 import { logout } from '../../store/slices/usersSlice';
 import { loadUserFromStorage } from '../../store/slices/usersSlice';
+import { loadUserNotifications } from '../../store/slices/notificationsSlice';
 import toast from 'react-hot-toast';
 import {
   DropdownMenu,
@@ -28,8 +29,18 @@ export function Header() {
 
   // Load user from localStorage on mount
   useEffect(() => {
-    dispatch(loadUserFromStorage());
+    dispatch(loadUserFromStorage()).then(() => {
+      // Load user-specific notifications after user is loaded
+      dispatch(loadUserNotifications());
+    });
   }, [dispatch]);
+  
+  // Reload notifications when user changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(loadUserNotifications());
+    }
+  }, [dispatch, isAuthenticated, currentUser?.id]);
 
   // Fetch movies if not loaded when opening search
   useEffect(() => {
@@ -40,6 +51,8 @@ export function Header() {
 
   const handleLogout = () => {
     dispatch(logout());
+    // Clear notifications when logging out
+    dispatch(loadUserNotifications()); // This will load empty notifications for no user
     toast.success('Logged out successfully');
     navigate('/');
   };

@@ -56,6 +56,16 @@ export default function Sessions() {
         
         {loading ? (
           <div className="text-center text-white py-12">Loading sessions...</div>
+        ) : sessions.length === 0 ? (
+          <div className="text-center text-white py-12">
+            <p className="text-xl mb-4">Aucune séance disponible pour ce film</p>
+            <p className="text-gray-400 mb-4">
+              Les séances doivent être ajoutées dans MockAPI avec le movieId correspondant.
+            </p>
+            <Button onClick={() => navigate(-1)} className="bg-red-600 hover:bg-red-700">
+              Retour
+            </Button>
+          </div>
         ) : (
           <div className="space-y-8">
             {Object.entries(sessionsByDate).map(([date, dateSessions]) => (

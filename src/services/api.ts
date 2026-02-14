@@ -60,8 +60,22 @@ export const movieApi = {
 export const bookingApi = {
   getSeats: async (sessionId: string): Promise<Seat[]> => {
     const response = await bookingsApiClient.get<Seat[]>('/seats');
-    // Filter by sessionId (assuming all seats are for sessionId "1" as per spec)
-    return response.data.filter(seat => seat.sessionId === sessionId);
+    
+    // First, try to get seats for the specific session
+    let seats = response.data.filter(seat => seat.sessionId === sessionId);
+    
+    // If no seats found for this session, use seats from any session and update their sessionId
+    // This handles cases where MockAPI only has seats for one session
+    if (seats.length === 0) {
+      console.log(`No seats found for sessionId ${sessionId}, using available seats and updating sessionId`);
+      seats = response.data.map((seat, index) => ({
+        ...seat,
+        id: `${sessionId}-${seat.id || index}`, // Make unique ID for this session
+        sessionId: sessionId, // Update sessionId to match current session
+      }));
+    }
+    
+    return seats;
   },
 
   createBooking: async (bookingData: Omit<Booking, 'id'>): Promise<Booking> => {
