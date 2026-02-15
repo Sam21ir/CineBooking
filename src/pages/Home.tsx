@@ -55,7 +55,7 @@ export default function Home() {
         />
       )}
       
-      <div className="relative -mt-20 md:-mt-32 space-y-8 pb-12 pt-8 md:pt-0">
+      <div className="relative space-y-8 pb-12 pt-24 md:pt-32">
         {loading ? (
           <div className="text-center text-white py-12">Chargement des films...</div>
         ) : (

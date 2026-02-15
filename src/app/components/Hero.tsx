@@ -31,7 +31,7 @@ export function Hero({ title, description, imageUrl, movieId, trailerUrl }: Hero
   };
 
   return (
-    <div className="relative h-[60vh] sm:h-[70vh] md:h-[80vh] w-full mt-16 sm:mt-20 md:mt-0">
+    <div className="relative h-[60vh] sm:h-[70vh] md:h-[80vh] w-full">
       {/* Background Image */}
       <div className="absolute inset-0">
         <img 

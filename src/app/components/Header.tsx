@@ -72,7 +72,7 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-sm">
+      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-transparent backdrop-blur-sm" style={{ backgroundColor: 'transparent' }}>
         <div className="flex items-center justify-between px-3 sm:px-4 md:px-8 py-2.5 sm:py-3 md:py-4">
           <div className="flex items-center gap-2 sm:gap-4 md:gap-8 min-w-0 flex-1">
             <Link to="/" onClick={() => setMobileMenuOpen(false)} className="group flex-shrink-0">
@@ -118,7 +118,7 @@ export function Header() {
               >
                 <div className="flex flex-col h-full">
                   {/* Header with logo */}
-                  <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-800/50">
+                  <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-800/50 pl-4 pt-4">
                     <h2 className="text-2xl font-bold text-white">Menu</h2>
                   </div>
                   
