@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { fetchMovies } from '../store/slices/moviesSlice';
+import { fetchMovies, setSelectedMovie } from '../store/slices/moviesSlice';
 import { Header } from '../app/components/Header';
 import { Hero } from '../app/components/Hero';
 import { MovieRow } from '../app/components/MovieRow';
@@ -13,9 +13,15 @@ import { Footer } from '../app/components/Footer';
 export default function Home() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { movies, loading } = useAppSelector((state) => state.movies);
+  const { movies, loading, selectedMovie } = useAppSelector((state) => state.movies);
   const { movies: myList } = useAppSelector((state) => state.myList);
   const { currentUser } = useAppSelector((state) => state.users);
+
+  // Define featuredMovie and other derived values first
+  const featuredMovie = movies[0];
+  const trendingMovies = movies.slice(0, 5);
+  const popularMovies = movies.slice(5, 10);
+  const newReleases = movies.slice(0, 5).reverse();
 
   useEffect(() => {
     if (movies.length === 0) {
@@ -23,11 +29,12 @@ export default function Home() {
     }
   }, [dispatch, movies.length]);
 
-  const trendingMovies = movies.slice(0, 5);
-  const popularMovies = movies.slice(5, 10);
-  const newReleases = movies.slice(0, 5).reverse();
-
-  const featuredMovie = movies[0];
+  // Set featured movie as selected when it loads
+  useEffect(() => {
+    if (featuredMovie && !selectedMovie) {
+      dispatch(setSelectedMovie(featuredMovie));
+    }
+  }, [dispatch, featuredMovie, selectedMovie]);
 
   return (
     <motion.div
@@ -43,10 +50,12 @@ export default function Home() {
           title={featuredMovie.title}
           description={featuredMovie.synopsis}
           imageUrl={featuredMovie.imageUrl}
+          movieId={featuredMovie.id}
+          trailerUrl={featuredMovie.trailerUrl}
         />
       )}
       
-      <div className="relative -mt-32 space-y-8 pb-12">
+      <div className="relative -mt-20 md:-mt-32 space-y-8 pb-12 pt-8 md:pt-0">
         {loading ? (
           <div className="text-center text-white py-12">Chargement des films...</div>
         ) : (

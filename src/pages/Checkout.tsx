@@ -118,7 +118,7 @@ export default function Checkout() {
       className="min-h-screen bg-[#0a0a0a]"
     >
       <Header />
-      <div className="container mx-auto px-4 py-12 pt-32">
+      <div className="container mx-auto px-4 py-8 md:py-12 pt-24 md:pt-32">
         <h1 className="text-4xl font-bold text-white mb-8">Checkout</h1>
         
         <div className="grid md:grid-cols-2 gap-8">
@@ -172,13 +172,13 @@ export default function Checkout() {
           <Card className="p-6 bg-gray-900 border-gray-800">
             <h2 className="text-2xl font-semibold text-white mb-6">Customer Information</h2>
             
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <Label htmlFor="customerName" className="text-white">Full Name</Label>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="customerName" className="text-white block mb-2">Full Name</Label>
                 <Input
                   id="customerName"
                   {...register('customerName', { required: 'Name is required' })}
-                  className="bg-gray-800 border-gray-700 text-white"
+                  className="bg-gray-800 border-gray-700 text-white mt-1"
                   placeholder="Samir El Alami"
                 />
                 {errors.customerName && (
@@ -186,8 +186,8 @@ export default function Checkout() {
                 )}
               </div>
 
-              <div>
-                <Label htmlFor="customerEmail" className="text-white">Email</Label>
+              <div className="space-y-2">
+                <Label htmlFor="customerEmail" className="text-white block mb-2">Email</Label>
                 <Input
                   id="customerEmail"
                   type="email"
@@ -198,7 +198,7 @@ export default function Checkout() {
                       message: 'Invalid email address'
                     }
                   })}
-                  className="bg-gray-800 border-gray-700 text-white"
+                  className="bg-gray-800 border-gray-700 text-white mt-1"
                   placeholder="Samir@example.com"
                 />
                 {errors.customerEmail && (

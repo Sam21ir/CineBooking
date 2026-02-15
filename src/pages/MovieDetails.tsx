@@ -82,7 +82,7 @@ export default function MovieDetails() {
       className="min-h-screen bg-[#0a0a0a]"
     >
       <Header />
-      <div className="pt-24">
+      <div className="pt-20 md:pt-24">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <motion.div

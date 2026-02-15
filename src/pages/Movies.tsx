@@ -24,7 +24,7 @@ export default function Movies() {
       className="min-h-screen bg-[#0a0a0a]"
     >
       <Header />
-      <div className="container mx-auto px-4 py-12 pt-32">
+      <div className="container mx-auto px-4 py-8 md:py-12 pt-24 md:pt-32">
         <h1 className="text-4xl font-bold text-white mb-8">Tous les Films</h1>
         {loading ? (
           <div className="text-center text-white py-12">Chargement des films...</div>
