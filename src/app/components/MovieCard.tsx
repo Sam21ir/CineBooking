@@ -28,9 +28,9 @@ export function MovieCard({ movie }: MovieCardProps) {
   };
 
   return (
-    <Link to={`/movies/${movie.id}`}>
+    <Link to={`/movies/${movie.id}`} className="block w-full">
       <div 
-        className="group relative flex-shrink-0 w-64 cursor-pointer transition-transform duration-300 hover:scale-105 hover:z-10"
+        className="group relative w-full cursor-pointer transition-transform duration-300 hover:scale-105 hover:z-10"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >

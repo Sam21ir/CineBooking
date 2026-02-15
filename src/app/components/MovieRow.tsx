@@ -36,8 +36,8 @@ export function MovieRow({ title, movies }: MovieRowProps) {
   };
   
   return (
-    <div className="space-y-4 px-8 md:px-16 mb-12">
-      <h2 className="text-white text-2xl font-semibold">{title}</h2>
+    <div className="space-y-4 px-4 sm:px-6 md:px-8 lg:px-16 mb-12 overflow-x-hidden">
+      <h2 className="text-white text-xl sm:text-2xl font-semibold">{title}</h2>
       
       <div className="relative group">
         {/* Left Arrow */}
@@ -53,14 +53,13 @@ export function MovieRow({ title, movies }: MovieRowProps) {
         {/* Movies Container */}
         <div 
           ref={rowRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+          className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {movies.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-            />
+            <div key={movie.id} className="flex-shrink-0 w-[140px] sm:w-[160px] md:w-[200px] lg:w-[240px]">
+              <MovieCard movie={movie} />
+            </div>
           ))}
         </div>
         

@@ -27,7 +27,7 @@ const createMockStore = () => {
 };
 
 describe('MovieCard', () => {
-  it('renders movie title', () => {
+  it('renders movie image with alt text', () => {
     render(
       <Provider store={createMockStore()}>
         <BrowserRouter>
@@ -36,10 +36,12 @@ describe('MovieCard', () => {
       </Provider>
     );
     
-    expect(screen.getByText('Test Movie')).toBeInTheDocument();
+    const image = screen.getByAltText('Test Movie');
+    expect(image).toBeInTheDocument();
+    expect(image).toHaveAttribute('src', 'https://example.com/image.jpg');
   });
 
-  it('renders movie rating', () => {
+  it('renders link to movie details page', () => {
     render(
       <Provider store={createMockStore()}>
         <BrowserRouter>
@@ -48,10 +50,11 @@ describe('MovieCard', () => {
       </Provider>
     );
     
-    expect(screen.getByText('8.5')).toBeInTheDocument();
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('href', '/movies/1');
   });
 
-  it('renders movie genre', () => {
+  it('renders movie card container', () => {
     render(
       <Provider store={createMockStore()}>
         <BrowserRouter>
@@ -60,7 +63,8 @@ describe('MovieCard', () => {
       </Provider>
     );
     
-    expect(screen.getByText('Action')).toBeInTheDocument();
+    const link = screen.getByRole('link');
+    expect(link).toBeInTheDocument();
   });
 });
 

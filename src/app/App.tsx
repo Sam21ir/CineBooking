@@ -19,8 +19,9 @@ export default function App() {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+    <div className="overflow-x-hidden">
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Home />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/populaires" element={<Populaires />} />
@@ -43,5 +44,6 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
+    </div>
   );
 }

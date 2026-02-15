@@ -1,13 +1,34 @@
-import axios from 'axios';
+// Mock axios BEFORE importing the api module
+const mockGet = jest.fn();
+const mockPost = jest.fn();
+
+jest.mock('axios', () => {
+  const mockGetFn = jest.fn();
+  const mockPostFn = jest.fn();
+  
+  // Store references globally so we can use them in tests
+  (global as any).__mockGet = mockGetFn;
+  (global as any).__mockPost = mockPostFn;
+  
+  return {
+    __esModule: true,
+    default: {
+      create: jest.fn(() => ({
+        get: mockGetFn,
+        post: mockPostFn,
+      })),
+    },
+  };
+});
+
 import { movieApi, bookingApi } from '../../services/api';
 import { Movie, Session } from '../../store/slices/moviesSlice';
 import { Seat, Booking } from '../../store/slices/bookingsSlice';
 
-// Mock axios
-jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
-
 describe('API Services', () => {
+  const mockGet = (global as any).__mockGet;
+  const mockPost = (global as any).__mockPost;
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -28,12 +49,11 @@ describe('API Services', () => {
         },
       ];
 
-      mockedAxios.create.mockReturnValue({
-        get: jest.fn().mockResolvedValue({ data: mockMovies }),
-      } as any);
+      mockGet.mockResolvedValue({ data: mockMovies });
 
       const movies = await movieApi.getMovies();
       expect(movies).toEqual(mockMovies);
+      expect(mockGet).toHaveBeenCalledWith('/movies');
     });
 
     it('should fetch movie by id', async () => {
@@ -49,12 +69,11 @@ describe('API Services', () => {
         releaseDate: '2024-01-01',
       };
 
-      mockedAxios.create.mockReturnValue({
-        get: jest.fn().mockResolvedValue({ data: mockMovie }),
-      } as any);
+      mockGet.mockResolvedValue({ data: mockMovie });
 
       const movie = await movieApi.getMovieById('1');
       expect(movie).toEqual(mockMovie);
+      expect(mockGet).toHaveBeenCalledWith('/movies/1');
     });
   });
 
@@ -74,9 +93,7 @@ describe('API Services', () => {
         customerEmail: 'test@example.com',
       };
 
-      mockedAxios.create.mockReturnValue({
-        post: jest.fn().mockResolvedValue({ data: mockBooking }),
-      } as any);
+      mockPost.mockResolvedValue({ data: mockBooking });
 
       const booking = await bookingApi.createBooking({
         userId: '1',
@@ -92,6 +109,11 @@ describe('API Services', () => {
       });
 
       expect(booking).toEqual(mockBooking);
+      expect(mockPost).toHaveBeenCalledWith('/bookings', expect.objectContaining({
+        userId: '1',
+        sessionId: '1',
+        movieId: '1',
+      }));
     });
   });
 });
