@@ -3,9 +3,9 @@ import { Booking } from '../store/slices/bookingsSlice';
 
 // n8n Webhook URLs - Update these with your actual n8n webhook URLs
 const N8N_BOOKING_CONFIRMATION_WEBHOOK = import.meta.env.VITE_N8N_BOOKING_WEBHOOK || 
-  'https://your-n8n-instance.com/webhook/booking-confirmation';
-const N8N_SESSION_REMINDER_WEBHOOK = import.meta.env.VITE_N8N_REMINDER_WEBHOOK || 
-  'https://your-n8n-instance.com/webhook/session-reminder';
+  'https://79bb3796.kube-ops.com/webhook/booking-confirmation';
+// const N8N_SESSION_REMINDER_WEBHOOK = import.meta.env.VITE_N8N_REMINDER_WEBHOOK || 
+//   'https://your-n8n-instance.com/webhook/session-reminder';
 
 /**
  * Send booking confirmation webhook to n8n

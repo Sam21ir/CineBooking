@@ -1,12 +1,15 @@
-// Validation utility functions tests
+import {
+  isRequired,
+  isValidDate,
+  isValidEmail,
+  isValidName,
+  isValidPrice,
+  validateSeatSelection,
+} from '../../utils/validations';
 
+// Validation utility functions tests
 describe('Validation Utils', () => {
   describe('Email Validation', () => {
-    const isValidEmail = (email: string): boolean => {
-      const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-      return emailRegex.test(email);
-    };
-
     it('should validate correct email addresses', () => {
       expect(isValidEmail('test@example.com')).toBe(true);
       expect(isValidEmail('user.name@domain.co.uk')).toBe(true);
@@ -23,10 +26,6 @@ describe('Validation Utils', () => {
   });
 
   describe('Required Field Validation', () => {
-    const isRequired = (value: string | null | undefined): boolean => {
-      return value !== null && value !== undefined && value.trim() !== '';
-    };
-
     it('should validate non-empty strings', () => {
       expect(isRequired('test')).toBe(true);
       expect(isRequired('  test  ')).toBe(true);
@@ -41,10 +40,6 @@ describe('Validation Utils', () => {
   });
 
   describe('Name Validation', () => {
-    const isValidName = (name: string): boolean => {
-      return name.trim().length >= 2 && /^[a-zA-Z\s'-]+$/.test(name);
-    };
-
     it('should validate correct names', () => {
       expect(isValidName('John Doe')).toBe(true);
       expect(isValidName('Jean-Pierre')).toBe(true);
@@ -59,10 +54,6 @@ describe('Validation Utils', () => {
   });
 
   describe('Seat Selection Validation', () => {
-    const validateSeatSelection = (selectedSeats: string[], maxSeats: number = 10): boolean => {
-      return selectedSeats.length > 0 && selectedSeats.length <= maxSeats;
-    };
-
     it('should validate correct seat selections', () => {
       expect(validateSeatSelection(['A1', 'A2'])).toBe(true);
       expect(validateSeatSelection(['A1'])).toBe(true);
@@ -76,10 +67,6 @@ describe('Validation Utils', () => {
   });
 
   describe('Price Validation', () => {
-    const isValidPrice = (price: number): boolean => {
-      return price > 0 && price <= 1000 && Number.isFinite(price);
-    };
-
     it('should validate correct prices', () => {
       expect(isValidPrice(12.50)).toBe(true);
       expect(isValidPrice(1)).toBe(true);
@@ -96,11 +83,6 @@ describe('Validation Utils', () => {
   });
 
   describe('Date Validation', () => {
-    const isValidDate = (dateString: string): boolean => {
-      const date = new Date(dateString);
-      return !isNaN(date.getTime()) && date >= new Date();
-    };
-
     it('should validate future dates', () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 1);

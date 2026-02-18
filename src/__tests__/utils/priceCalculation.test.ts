@@ -1,27 +1,12 @@
+import {
+  calculatePremiumPrice,
+  calculateSeatPrice,
+  calculateTotal,
+  roundToTwoDecimals,
+} from '../../utils/priceCalculation';
+
 // Price calculation utility functions tests
-
 describe('Price Calculation Utils', () => {
-  const calculateTotal = (price: number, seats: number): number => {
-    return price * seats;
-  };
-
-  const calculatePremiumPrice = (basePrice: number, multiplier: number = 1.5): number => {
-    return basePrice * multiplier;
-  };
-
-  const roundToTwoDecimals = (price: number): number => {
-    return Math.round(price * 100) / 100;
-  };
-
-  const calculateSeatPrice = (basePrice: number, seatType: 'standard' | 'premium' | 'pmr'): number => {
-    const multipliers = {
-      standard: 1,
-      premium: 1.5,
-      pmr: 1, // PMR seats same price as standard
-    };
-    return basePrice * multipliers[seatType];
-  };
-
   it('should calculate total price correctly', () => {
     const seatPrice = 10;
     const numberOfSeats = 3;

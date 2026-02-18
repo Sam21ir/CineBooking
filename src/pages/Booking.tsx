@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchSeats, toggleSeatSelection, clearSelectedSeats } from '../store/slices/seatsSlice';
 import { Header } from '../app/components/Header';
 import { Button } from '../app/components/ui/button';
+import { calculateTotal, roundToTwoDecimals } from '../utils/priceCalculation';
 
 export default function Booking() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -133,7 +134,7 @@ export default function Booking() {
                 Selected: {selectedSeats.length} seat{selectedSeats.length !== 1 ? 's' : ''}
                 {selectedSession && (
                   <span className="ml-4">
-                    Total: {(selectedSeats.length * selectedSession.price).toFixed(2)} €
+                    Total: {roundToTwoDecimals(calculateTotal(selectedSession.price, selectedSeats.length)).toFixed(2)} €
                   </span>
                 )}
               </p>

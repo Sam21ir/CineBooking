@@ -12,6 +12,7 @@ import { Button } from '../app/components/ui/button';
 import { Input } from '../app/components/ui/input';
 import { Label } from '../app/components/ui/label';
 import { Card } from '../app/components/ui/card';
+import { calculateTotal, roundToTwoDecimals } from '../utils/priceCalculation';
 
 interface CheckoutFormData {
   customerName: string;
@@ -32,7 +33,7 @@ export default function Checkout() {
 
   useEffect(() => {
     if (selectedSession && selectedSeats.length > 0) {
-      setTotalPrice(selectedSeats.length * selectedSession.price);
+      setTotalPrice(roundToTwoDecimals(calculateTotal(selectedSession.price, selectedSeats.length)));
     }
   }, [selectedSession, selectedSeats]);
 
