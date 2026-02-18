@@ -44,7 +44,7 @@ export default function Home() {
       className="min-h-screen bg-[#0a0a0a]"
     >
       <Header />
-      
+
       {featuredMovie && (
         <Hero
           title={featuredMovie.title}
@@ -54,8 +54,8 @@ export default function Home() {
           trailerUrl={featuredMovie.trailerUrl}
         />
       )}
-      
-      <div className="relative space-y-8 pb-12 pt-24 md:pt-32">
+
+      <div className="relative space-y-8 pb-12">
         {loading ? (
           <div className="text-center text-white py-12">Chargement des films...</div>
         ) : (
@@ -64,7 +64,7 @@ export default function Home() {
             {movies.length > 0 && (
               <TrendingSection movies={movies} />
             )}
-            
+
             {/* AI Personalized Recommendations (if user is logged in) */}
             {currentUser && movies.length > 0 && (
               <RecommendedMovies
@@ -77,7 +77,7 @@ export default function Home() {
                 }}
               />
             )}
-            
+
             {trendingMovies.length > 0 && (
               <MovieRow title="Populaires sur CineBooking" movies={popularMovies} />
             )}
@@ -87,7 +87,7 @@ export default function Home() {
           </>
         )}
       </div>
-      
+
       <Footer />
     </motion.div>
   );
