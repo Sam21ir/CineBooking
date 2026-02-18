@@ -1,7 +1,7 @@
 .env
 node_modules
 ADDING_SESSIONS_GUIDE.md
-TESTING_SUMMARY.md
+TESTING.md
 n8n/
 dist/
 ENV_EXAMPLE.txt
