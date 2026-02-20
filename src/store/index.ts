@@ -8,6 +8,8 @@ import recommendationsReducer from './slices/recommendationsSlice';
 import myListReducer from './slices/myListSlice';
 import notificationsReducer from './slices/notificationsSlice';
 
+import chatReducer from './slices/chatSlice';
+
 export const store = configureStore({
   reducer: {
     movies: moviesReducer,
@@ -18,6 +20,7 @@ export const store = configureStore({
     recommendations: recommendationsReducer,
     myList: myListReducer,
     notifications: notificationsReducer,
+    chat: chatReducer,
   },
 });
 

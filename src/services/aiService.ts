@@ -270,3 +270,44 @@ export async function generateAISynopsisWithProxy(movie: Movie): Promise<string>
   // Fallback : fonction existante
   return generateAISynopsis(movie);
 }
+
+/**
+ * Generates a response for the AI Chatbot based on user query and available movies.
+ */
+export async function getChatResponse(
+  message: string,
+  movies: Movie[],
+  history: { role: 'user' | 'assistant'; content: string }[]
+): Promise<string> {
+  if (!isAIAvailable() || !genAI) {
+    return "Je suis désolé, je ne peux pas répondre pour le moment car l'IA n'est pas configurée.";
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+
+    const moviesContext = movies.map(m => ({
+      title: m.title,
+      genre: m.genre,
+      rating: m.rating,
+    })).slice(0, 15);
+
+    // Prompt de système intégré directement pour plus de stabilité
+    const systemPrompt = `Tu es l'assistant IA de CineBooking. Réponds de manière amicale et concise.
+Films disponibles : ${JSON.stringify(moviesContext)}
+Règles : Maximum 3 phrases. Emojis autorisés. Ne parle que des films de la liste.`;
+
+    // Construction manuelle de la conversation pour éviter les erreurs de session SDK
+    // On prend les 4 derniers messages pour garder du contexte sans saturer le prompt
+    const recentHistory = history.slice(-4);
+    const historyText = recentHistory.map(h => `${h.role === 'user' ? 'Utilisateur' : 'Assistant'}: ${h.content}`).join('\n');
+
+    const fullPrompt = `${systemPrompt}\n\n${historyText}\nUtilisateur: ${message}\nAssistant:`;
+
+    const result = await model.generateContent(fullPrompt);
+    return result.response.text();
+  } catch (error) {
+    console.error('🤖 Chat AI Error:', error);
+    return "Désolé, j'ai une petite panne de connexion. Réessayez dans un instant !";
+  }
+}

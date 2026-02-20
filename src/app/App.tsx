@@ -17,6 +17,7 @@ const NotFound = lazy(() => import('../pages/NotFound'));
 import { LoginForm } from './components/LoginForm';
 import { RegisterForm } from './components/RegisterForm';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { ChatBot } from './components/ChatBot';
 
 export default function App() {
   const location = useLocation();
@@ -54,7 +55,10 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
-    </AnimatePresence>
+      </AnimatePresence>
+
+      {/* Global AI ChatBot */}
+      <ChatBot />
     </div>
   );
 }
