@@ -20,7 +20,7 @@ Application front-end React (Vite) de réservation de séances cinéma, conçue 
 - **IA (Gemini)** : recommandations personnalisées / films similaires / synopsis enrichi (si clé dispo)
 - **Automatisation n8n** : webhook de confirmation de réservation (non bloquant)
 
-## Parcours utilisateur (démo soutenance)
+## Parcours utilisateur
 
 - Accueil → Films → Détail d’un film → Séances → Réservation (choix des sièges)
 - Checkout : saisie nom/email + validation → confirmation
@@ -40,7 +40,7 @@ Application front-end React (Vite) de réservation de séances cinéma, conçue 
 
 ## Installation & lancement
 
-Pré-requis : Node.js 18+ (recommandé).
+Pré-requis : Node.js 18+.
 
 ```bash
 npm install
@@ -71,10 +71,10 @@ npm run test:coverage
 
 Ce projet utilise des variables Vite (`VITE_*`).
 
-- Copier `ENV_EXAMPLE.txt` vers `.env` à la racine, puis adapter les valeurs
+- `.env` à la racine
 - Variables clés :
-  - **IA Gemini** : `VITE_GEMINI_API_KEY` (optionnel, fallback si absent)
-  - **n8n** : `VITE_N8N_BOOKING_WEBHOOK`, `VITE_N8N_REMINDER_WEBHOOK` (optionnel, non bloquant)
+  - **IA Gemini** : `VITE_GEMINI_API_KEY`
+  - **n8n** : `VITE_N8N_BOOKING_WEBHOOK`, `VITE_N8N_REMINDER_WEBHOOK`
 
 ## API (MockAPI) & CRUD
 
@@ -84,24 +84,21 @@ Les appels Axios sont centralisés dans `src/services/api.ts`.
   - GET `/movies`, GET `/movies/:id`
   - GET `/sessions`, GET `/sessions/:id`
 - **Seats/Bookings**
-  - GET `/seats` (filtrage par session côté front)
+  - GET `/seats`
   - POST `/bookings`
   - GET `/bookings`, GET `/bookings/:id`
 - **Users**
   - GET `/users`, GET `/users/:id`
-  - POST `/users` (register)
+  - POST `/users`
   - PUT `/users/:id` (update)
   - login simulé via recherche email + password
 
-### Ajouter des séances pour les nouveaux films
-
-Voir `ADDING_SESSIONS_GUIDE.md` (important si tu ajoutes des films dans MockAPI).
 
 ## Redux Toolkit (state global)
 
 Store : `src/store/index.ts`
 
-Slices (exemples) : `src/store/slices/*`
+Slices : `src/store/slices/*`
 - `moviesSlice` (liste + film sélectionné)
 - `sessionsSlice` (séances + séance sélectionnée)
 - `seatsSlice` (sièges + sélection)
@@ -133,23 +130,19 @@ Service : `src/services/webhookService.ts`
 - Webhook déclenché au Checkout après création de réservation
 - Le webhook est **non bloquant** : une erreur n’empêche pas la réservation
 
-Doc n8n : voir `n8n/README.md` (variables + payload + workflow minimal).
-
 ## Tests
 
 - Config : `jest.config.js` + `src/setupTests.ts`
-- Résumé : `TESTING_SUMMARY.md`
 
 ```bash
 npm test
 ```
 
-## Déploiement (Vercel)
+## Déploiement avec Vercel
 
+- [lien](https://cinebooking.samirelalami.space)
 - Framework : Vite (React)
 - Build Command : `npm run build`
-- Output Directory : `dist`
-- Variables d’environnement : copier celles de `.env` dans le dashboard Vercel
 
 Note : l’app utilise `HashRouter` (URLs avec `#`) pour éviter les erreurs de refresh sur une SPA sans configuration serveur.
 
