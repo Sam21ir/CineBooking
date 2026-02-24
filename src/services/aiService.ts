@@ -1,19 +1,16 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { Movie } from '../store/slices/moviesSlice';
 
-// ─── Config Gemini (inchangé) ─────────────────────────────────────────────────
+// ─── Config Gemini ─────────────────────────────────────────────────────────────
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-const genAI = (API_KEY && API_KEY.trim() && API_KEY !== 'your-api-key-here')
+const genAI = (API_KEY && API_KEY.trim() && API_KEY !== 'VITE_GEMINI_API_KEY')
   ? new GoogleGenerativeAI(API_KEY)
   : null;
 
-/**
- * Using 'gemini-1.5-flash' - faster, more reliable, and has a generous free tier.
- * Alternative: 'gemini-pro' for better quality (slower, more expensive)
- */
-const MODEL_NAME = 'gemini-1.5-flash';
+// ⚠️ gemini-1.5-flash est déprécié — remplacé par gemini-2.5-flash
+const MODEL_NAME = 'gemini-2.5-flash';
 
 export function isAIAvailable(): boolean {
   return genAI !== null;
@@ -39,37 +36,43 @@ const cleanJsonReadyText = (text: string) => {
   return text.replace(/```json/g, '').replace(/```/g, '').trim();
 };
 
-// ─── Proxy n8n (Workflow 5) — optionnel, clé sécurisée côté serveur ──────────
+// ─── Webhook n8n Chatbot ───────────────────────────────────────────────────────
+// Toutes les requêtes chat passent par ce webhook (clé Gemini sécurisée côté n8n)
 
-const N8N_AI_WEBHOOK = import.meta.env.VITE_N8N_AI_WEBHOOK || 'https://79bb3796.kube-ops.com/webhook/cinebooking-ai';
+const N8N_CHAT_WEBHOOK = 'https://79bb3796.kube-ops.com/webhook/chatbot';
+
+// ─── Proxy n8n (Workflow 5) — pour synopsis, similar, etc. ───────────────────
+
+// const N8N_AI_WEBHOOK = import.meta.env.VITE_N8N_AI_WEBHOOK || 'https://79bb3796.kube-ops.com/webhook/cinebooking-ai';
 
 /**
  * Appelle Gemini via le proxy n8n (la clé API reste côté serveur n8n).
  * Retourne null si le webhook n'est pas configuré ou échoue.
  */
-async function callAIProxy(payload: {
-  type: 'recommendations' | 'synopsis' | 'similar' | 'trending';
-  movieTitle?: string;
-  genre?: string;
-  synopsis?: string;
-  moviesList?: string[];
-  userPreferences?: string;
-}): Promise<unknown | null> {
-  if (!N8N_AI_WEBHOOK) return null;
-
-  try {
-    const res = await fetch(N8N_AI_WEBHOOK, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data?.success ? data.data : null;
-  } catch {
-    return null; // non-bloquant
-  }
-}
+// async function callAIProxy(payload: {
+//   type: 'recommendations' | 'synopsis' | 'similar' | 'trending' | 'chat';
+//   movieTitle?: string;
+//   genre?: string;
+//   synopsis?: string;
+//   moviesList?: string[];
+//   userPreferences?: string;
+//   message?: string;
+//   history?: any[];
+// }): Promise<unknown | null> {
+//   if (!N8N_AI_WEBHOOK) return null;
+//   try {
+//     const res = await fetch(N8N_AI_WEBHOOK, {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify(payload),
+//     });
+//     if (!res.ok) return null;
+//     const data = await res.json();
+//     return data?.success ? data.data : null;
+//   } catch {
+//     return null;
+//   }
+// }
 
 // ─── Fonctions existantes (inchangées) ───────────────────────────────────────
 
@@ -222,92 +225,72 @@ Return ONLY a JSON array of titles. Example: ["Movie A", "Movie B", "Movie C", "
   }
 }
 
-// ─── Nouvelles fonctions utilisant le proxy n8n (Workflow 5) ─────────────────
+// ─── Fonctions proxy n8n (commentées — remplacées par getChatResponse via webhook) ──
+
+// export async function getSimilarMoviesWithProxy(request: AISimilarMoviesRequest): Promise<Movie[]> {
+//   const proxyResult = await callAIProxy({
+//     type: 'similar',
+//     movieTitle: request.movie.title,
+//     genre: request.movie.genre,
+//     moviesList: request.allMovies.filter(m => m.id !== request.movie.id).map(m => m.title),
+//   }) as { titles?: string[] } | null;
+//   if (proxyResult?.titles && proxyResult.titles.length > 0) {
+//     return proxyResult.titles.map((t: string) => request.allMovies.find(m => m.title === t)).filter((m): m is Movie => !!m);
+//   }
+//   return getSimilarMovies(request);
+// }
+
+// export async function generateAISynopsisWithProxy(movie: Movie): Promise<string> {
+//   const proxyResult = await callAIProxy({
+//     type: 'synopsis',
+//     movieTitle: movie.title,
+//     synopsis: movie.synopsis,
+//   }) as { text?: string } | null;
+//   if (proxyResult?.text) return proxyResult.text;
+//   return generateAISynopsis(movie);
+// }
+
+// ─── getChatResponse — via webhook n8n ───────────────────────────────────────
 
 /**
- * Version proxy n8n de getSimilarMovies.
- * Utilise n8n si disponible, sinon repasse sur getSimilarMovies() existant.
- *
- * @example
- * const similar = await getSimilarMoviesWithProxy({ movie, allMovies });
- */
-export async function getSimilarMoviesWithProxy(request: AISimilarMoviesRequest): Promise<Movie[]> {
-  // Tentative via proxy n8n (clé sécurisée côté serveur)
-  const proxyResult = await callAIProxy({
-    type: 'similar',
-    movieTitle: request.movie.title,
-    genre: request.movie.genre,
-    moviesList: request.allMovies.filter(m => m.id !== request.movie.id).map(m => m.title),
-  }) as { titles?: string[] } | null;
-
-  if (proxyResult?.titles && proxyResult.titles.length > 0) {
-    console.log('🤖 Similar movies via n8n proxy:', proxyResult.titles);
-    return proxyResult.titles
-      .map((t: string) => request.allMovies.find(m => m.title === t))
-      .filter((m): m is Movie => !!m);
-  }
-
-  // Fallback : fonction existante
-  return getSimilarMovies(request);
-}
-
-/**
- * Version proxy n8n de generateAISynopsis.
- * Utilise n8n si disponible, sinon repasse sur generateAISynopsis() existant.
- */
-export async function generateAISynopsisWithProxy(movie: Movie): Promise<string> {
-  const proxyResult = await callAIProxy({
-    type: 'synopsis',
-    movieTitle: movie.title,
-    synopsis: movie.synopsis,
-  }) as { text?: string } | null;
-
-  if (proxyResult?.text) {
-    console.log('🤖 Synopsis via n8n proxy ✅');
-    return proxyResult.text;
-  }
-
-  // Fallback : fonction existante
-  return generateAISynopsis(movie);
-}
-
-/**
- * Generates a response for the AI Chatbot based on user query and available movies.
+ * Envoie le message au webhook n8n qui gère Gemini + historique Google Sheets.
+ * Format attendu par le webhook : { session_id, message }
+ * Format retourné par le webhook  : { reply, session_id }
  */
 export async function getChatResponse(
   message: string,
   movies: Movie[],
-  history: { role: 'user' | 'assistant'; content: string }[]
+  history: { role: 'user' | 'assistant'; content: string }[],
+  sessionId: string = 'default_session'
 ): Promise<string> {
-  if (!isAIAvailable() || !genAI) {
-    return "Je suis désolé, je ne peux pas répondre pour le moment car l'IA n'est pas configurée.";
-  }
+  console.log('🤖 Envoi du message au webhook n8n...');
 
   try {
-    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+    const res = await fetch(N8N_CHAT_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: sessionId,
+        message: message,
+      }),
+    });
 
-    const moviesContext = movies.map(m => ({
-      title: m.title,
-      genre: m.genre,
-      rating: m.rating,
-    })).slice(0, 15);
+    if (!res.ok) {
+      console.error('🤖 Webhook n8n erreur HTTP:', res.status);
+      throw new Error(`HTTP ${res.status}`);
+    }
 
-    // Prompt de système intégré directement pour plus de stabilité
-    const systemPrompt = `Tu es l'assistant IA de CineBooking. Réponds de manière amicale et concise.
-Films disponibles : ${JSON.stringify(moviesContext)}
-Règles : Maximum 3 phrases. Emojis autorisés. Ne parle que des films de la liste.`;
+    const data = await res.json();
+    console.log('🤖 Réponse webhook n8n:', data);
 
-    // Construction manuelle de la conversation pour éviter les erreurs de session SDK
-    // On prend les 4 derniers messages pour garder du contexte sans saturer le prompt
-    const recentHistory = history.slice(-4);
-    const historyText = recentHistory.map(h => `${h.role === 'user' ? 'Utilisateur' : 'Assistant'}: ${h.content}`).join('\n');
+    if (data?.reply) {
+      return data.reply;
+    }
 
-    const fullPrompt = `${systemPrompt}\n\n${historyText}\nUtilisateur: ${message}\nAssistant:`;
+    throw new Error('Réponse inattendue du webhook');
 
-    const result = await model.generateContent(fullPrompt);
-    return result.response.text();
   } catch (error) {
-    console.error('🤖 Chat AI Error:', error);
-    return "Désolé, j'ai une petite panne de connexion. Réessayez dans un instant !";
+    console.error('🤖 Erreur webhook n8n:', error);
+    return "Désolé, je n'arrive pas à contacter l'assistant IA pour le moment. Veuillez réessayer dans un instant !";
   }
 }
