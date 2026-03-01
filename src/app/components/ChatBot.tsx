@@ -12,6 +12,11 @@ export function ChatBot() {
     const [inputValue, setInputValue] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    // to generate a unique session ID once per browser session
+    const sessionId = useRef<string>(
+        `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    );
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -35,7 +40,8 @@ export function ChatBot() {
         try {
             // Get AI response
             const history = messages.map(m => ({ role: m.role, content: m.content }));
-            const response = await getChatResponse(userMessage, movies, history);
+            // every user gets their own isolated history like user_1748392847_x7k2m — no more mixing between users , (in future i'll link it to user accounts for even better experience)
+            const response = await getChatResponse(userMessage, movies, history, sessionId.current);
 
             // Add assistant response to state
             dispatch(addMessage({ role: 'assistant', content: response }));

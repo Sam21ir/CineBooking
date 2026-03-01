@@ -3,9 +3,7 @@ import { Booking } from '../store/slices/bookingsSlice';
 
 // ─── URLs Webhooks n8n ────────────────────────────────────────────────────────
 
-const N8N_BOOKING_CONFIRMATION_WEBHOOK = import.meta.env.VITE_N8N_BOOKING_WEBHOOK ||
-  'https://79bb3796.kube-ops.com/webhook/booking-confirmation';
-
+const N8N_BOOKING_CONFIRMATION_WEBHOOK = import.meta.env.VITE_N8N_BOOKING_WEBHOOK || 'https://79bb3796.kube-ops.com/webhook/booking-confirmation';
 const N8N_REMINDER_WEBHOOK = import.meta.env.VITE_N8N_REMINDER_WEBHOOK || 'https://79bb3796.kube-ops.com/webhook/cinebooking-reminder';
 const N8N_SHEETS_WEBHOOK = import.meta.env.VITE_N8N_SHEETS_WEBHOOK || 'https://79bb3796.kube-ops.com/webhook/cinebooking-sheets';
 const N8N_CANCEL_WEBHOOK = import.meta.env.VITE_N8N_CANCEL_WEBHOOK || 'https://79bb3796.kube-ops.com/webhook/cinebooking-cancel';
