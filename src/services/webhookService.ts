@@ -75,11 +75,6 @@ export async function sendBookingConfirmationWebhook(
 
 // ─── Workflow 2 — Rappel séance 2h avant ─────────────────────────────────────
 
-/**
- * Programme un rappel automatique envoyé 2h avant la séance.
- * Le nœud Wait de n8n calcule le délai à partir de seanceDateTime.
- * Appeler en même temps que sendBookingConfirmationWebhook.
- */
 export async function sendSeanceReminderWebhook(
   booking: Booking,
   movieTitle: string,
@@ -94,7 +89,7 @@ export async function sendSeanceReminderWebhook(
     movieTitle,
     sessionDate,
     sessionTime,
-    seanceDateTime,          // utilisé par le nœud Wait de n8n
+    seanceDateTime,
     seats: booking.seats,
     totalPrice: booking.totalPrice,
   };
@@ -104,10 +99,6 @@ export async function sendSeanceReminderWebhook(
 
 // ─── Workflow 3 — Google Sheets dashboard admin ───────────────────────────────
 
-/**
- * Logue chaque réservation dans le Google Sheet admin en temps réel.
- * Appeler en même temps que sendBookingConfirmationWebhook.
- */
 export async function sendSheetsLogWebhook(
   booking: Booking,
   movieTitle: string,
@@ -133,10 +124,6 @@ export async function sendSheetsLogWebhook(
 
 // ─── Workflow 6 — Annulation de réservation ──────────────────────────────────
 
-/**
- * Déclenche l'email d'annulation client + le log Google Sheets.
- * Appeler APRÈS avoir annulé la réservation dans MockAPI.
- */
 export async function sendCancellationWebhook(
   booking: Booking,
   movieTitle: string,
@@ -158,17 +145,6 @@ export async function sendCancellationWebhook(
 
   return postWebhook(N8N_CANCEL_WEBHOOK, payload, 'Annulation réservation');
 }
-
-// ─── Helper : lancer tous les workflows post-checkout en parallèle ────────────
-
-/**
- * Lance confirmation + rappel + Google Sheets en parallèle (non-bloquant).
- * Remplace les 3 appels séparés dans ta page Confirmation.
- *
- * @example
- * // Dans ConfirmationPage.tsx, après création de la réservation :
- * sendAllBookingWebhooks(booking, movie.title, session.date, session.time, session.dateTime);
- */
 export async function sendAllBookingWebhooks(
   booking: Booking,
   movieTitle: string,
