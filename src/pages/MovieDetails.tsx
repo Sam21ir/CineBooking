@@ -83,29 +83,31 @@ export default function MovieDetails() {
     >
       <Header />
       <div className="pt-20 md:pt-24">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
+        <div className="container mx-auto px-3 sm:px-4">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 mb-12">
             <motion.div
               initial={{ x: -50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              className="relative flex justify-center"
+              className="relative flex justify-center lg:justify-start lg:w-[40%]"
             >
               <img
                 src={selectedMovie.imageUrl}
                 alt={selectedMovie.title}
-                className="w-full max-w-md h-auto rounded-lg object-cover shadow-2xl"
+                className="w-full max-w-xs sm:max-w-sm md:max-w-md h-auto rounded-lg object-cover shadow-2xl"
               />
             </motion.div>
             <motion.div
               initial={{ x: 50, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              className="text-white"
+              className="text-white lg:w-[60%]"
             >
-              <h1 className="text-5xl font-bold mb-4">{selectedMovie.title}</h1>
-              <div className="flex items-center gap-6 mb-6">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">
+                {selectedMovie.title}
+              </h1>
+              <div className="flex flex-wrap items-center gap-3 sm:gap-6 mb-4 sm:mb-6 text-sm sm:text-base">
                 <div className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                  <span className="text-xl">{selectedMovie.rating}</span>
+                  <span className="text-base sm:text-lg">{selectedMovie.rating}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5" />
@@ -117,19 +119,23 @@ export default function MovieDetails() {
                 </div>
               </div>
               <div className="mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-gray-300 leading-relaxed">{displaySynopsis}</p>
-                  {aiSynopsis[selectedMovie.id] && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setUseAISynopsis(!useAISynopsis)}
-                      className="text-xs text-yellow-500 hover:text-yellow-400 flex items-center gap-1"
-                    >
-                      <Sparkles className="w-3 h-3" />
-                      {useAISynopsis ? 'Original' : 'IA'}
-                    </Button>
-                  )}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+                      {displaySynopsis}
+                    </p>
+                    {aiSynopsis[selectedMovie.id] && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setUseAISynopsis(!useAISynopsis)}
+                        className="ml-2 shrink-0 text-[11px] sm:text-xs text-yellow-500 hover:text-yellow-400 flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1"
+                      >
+                        <Sparkles className="w-3 h-3" />
+                        {useAISynopsis ? 'Original' : 'IA'}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="mb-6">
@@ -137,11 +143,11 @@ export default function MovieDetails() {
                   {selectedMovie.genre}
                 </span>
               </div>
-              <div className="flex gap-4">
+              <div className="flex flex-wrap gap-3 sm:gap-4">
                 <Button
                   onClick={() => window.open(selectedMovie.trailerUrl, '_blank')}
                   variant="outline"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center"
                 >
                   <Play className="w-4 h-4" />
                   Voir la bande-annonce
@@ -149,7 +155,7 @@ export default function MovieDetails() {
                 <Button
                   onClick={handleToggleMyList}
                   variant={isInMyList ? "default" : "outline"}
-                  className={`flex items-center gap-2 ${
+                  className={`flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center ${
                     isInMyList ? 'bg-red-600 hover:bg-red-700' : ''
                   }`}
                 >
@@ -166,8 +172,8 @@ export default function MovieDetails() {
                   )}
                 </Button>
                 {sessions.length > 0 ? (
-                  <Link to={`/sessions/${id}`}>
-                    <Button className="bg-red-600 hover:bg-red-700">
+                  <Link to={`/sessions/${id}`} className="w-full sm:w-auto">
+                    <Button className="bg-red-600 hover:bg-red-700 w-full sm:w-auto justify-center">
                       Réserver
                     </Button>
                   </Link>

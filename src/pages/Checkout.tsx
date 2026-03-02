@@ -181,7 +181,7 @@ export default function Checkout() {
                   id="customerName"
                   {...register('customerName', { required: 'Name is required' })}
                   className="bg-gray-800 border-gray-700 text-white mt-1"
-                  placeholder="Samir El Alami"
+                  placeholder="Full Name"
                 />
                 {errors.customerName && (
                   <p className="text-red-500 text-sm mt-1">{errors.customerName.message}</p>
@@ -201,7 +201,7 @@ export default function Checkout() {
                     }
                   })}
                   className="bg-gray-800 border-gray-700 text-white mt-1"
-                  placeholder="Samir@example.com"
+                  placeholder="your@email.com"
                 />
                 {errors.customerEmail && (
                   <p className="text-red-500 text-sm mt-1">{errors.customerEmail.message}</p>
